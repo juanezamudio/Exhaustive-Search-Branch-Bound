@@ -272,3 +272,18 @@ fun isValidQueen [] = true
 
 (* returns all solutions for an n x n board *)
 fun NQueens n = lazyFilter isValidQueen (queenGen (SOME (lenNList n)) n);
+
+(*a*)
+val a = NQueens 3;
+val b = NQueens 5;
+val b1 = lazyRest b;
+val b2 = lazyRest b1;
+val b3 = lazyRest b2;
+val b4 = lazyRest b3;
+val b5 = lazyRest b4;
+val b6 = lazyRest b5;
+val b7 = lazyRest b6;
+val b8 = lazyRest b7;
+val b9 = lazyRest b8;
+val b10 = lazyRest b9;
+val c = 92;
