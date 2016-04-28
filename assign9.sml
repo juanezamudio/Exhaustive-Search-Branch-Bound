@@ -146,15 +146,15 @@ fun isGoodRoomer [] = false
 fun roomerGen NONE = LazyNil
   | roomerGen (SOME k) = LazyCons(k, fn () => roomerGen (nextRoomer k));
 
-fun roomerNames (b::c::f::m::s::[]) = [("baker",b), ("cooper",c), ("fletcher",f), ("miller",m), ("smith",s)]
+fun roomerNames (b::c::f::m::s::[]) = [("Baker",b), ("Cooper",c), ("Fletcher",f), ("Miller",m), ("Smith",s)]
   | roomerNames (x::xs) = [("Invalid", x)]
   | roomerNames [] = [("Invalid", 0)];
 
 
-fun addAllNames lst = map roomerNames lst;
+fun addAllNames lst = lazyMap roomerNames lst;
 
 (* gives a lazylist of all solutions *)
-val roomer = lazyFilter isGoodRoomer (roomerGen (SOME [1,1,1,1,1]));
+val roomer = addAllNames (lazyFilter isGoodRoomer (roomerGen (SOME [1,1,1,1,1])));
 
 
 
@@ -185,12 +185,7 @@ fun xor a b = ((a orelse b) andalso not(a andalso b));
 
 (* Determines if the list is valid *)
 fun isValidLiar [] = false
-  | isValidLiar (1::n::r::2::w::[]) = false
-  | isValidLiar (n::2::r::4::w::[]) = false
-  | isValidLiar (d::2::3::t::w::[]) = false
-  | isValidLiar (d::n::r::3::5::[]) = false
-  | isValidLiar (d::n::1::t::4::[]) = false
-  | isValidLiar (d::n::r::t::w::[]) =
+   |isValidLiar (d::n::r::t::w::[]) =
     let
         val d1 = (d=1);
         val d2 = (t=2);
@@ -213,8 +208,15 @@ fun isValidLiar [] = false
     end
   | isValidLiar _ = false;
 
+fun liarNames (d::n::r::t::w::[]) = [("Daxter",d), ("Navi",n), ("Raiden",r), ("Tingle",t), ("Waluigi",w)]
+  | liarNames (x::xs) = [("Invalid", x)]
+  | liarNames [] = [("Invalid", 0)];
+
+
+fun addLiarNames lst = lazyMap liarNames lst;
+
 (* gives a lazylist of all solutions *)
-val liar = lazyFilter isValidLiar (liarGen (SOME [1,1,1,1,1]));
+val liar = addLiarNames (lazyFilter isValidLiar (liarGen (SOME [1,1,1,1,1])));
 
 (*
  * Problem 3
@@ -273,7 +275,7 @@ fun isValidQueen [] = true
 (* returns all solutions for an n x n board *)
 fun NQueens n = lazyFilter isValidQueen (queenGen (SOME (lenNList n)) n);
 
-(*a*)
+(* Answers *)
 val a = NQueens 3;
 val b = NQueens 5;
 val b1 = lazyRest b;
@@ -287,3 +289,29 @@ val b8 = lazyRest b7;
 val b9 = lazyRest b8;
 val b10 = lazyRest b9;
 val c = 92;
+
+(*
+ * Problem 4
+ *
+ * Yachts
+ *)
+
+(* nextState function *)
+fun nextDaughter [] = NONE
+  | nextDaughter (x::xs) =
+    if x = 5 then
+        case nextDaughter xs of
+            NONE => NONE
+          | SOME v => SOME (1::v)
+    else
+        SOME ((x+1)::xs);
+
+(* generate a lazy list of all possible solutions *)
+fun daughterGen NONE = LazyNil
+  | daughterGen (SOME k) = LazyCons(k, fn () => daughterGen (nextDaughter k));
+
+(* determines if the list is valid *)
+fun isValidDaughter [] = false
+  | isValidDaughter (b::m::h::d::p::[]) = 
+    
+        
