@@ -151,7 +151,7 @@ fun roomerNames (b::c::f::m::s::[]) = [("baker",b), ("cooper",c), ("fletcher",f)
   | roomerNames [] = [("Invalid", 0)];
 
 
-fun addAllNames lst = map roomerNames lst;
+fun addAllNames lst = lazyMap roomerNames lst;
 
 (* gives a lazylist of all solutions *)
 val roomer = lazyFilter isGoodRoomer (roomerGen (SOME [1,1,1,1,1]));
@@ -287,3 +287,251 @@ val b8 = lazyRest b7;
 val b9 = lazyRest b8;
 val b10 = lazyRest b9;
 val c = 92;
+
+
+
+
+(*
+ * Problem 5
+ *
+ * NQueens (again)
+ *
+ *)
+
+(* generate a list of n 1s *)
+fun lenNList 0 = []
+  | lenNList n = 1::(lenNList (n-1));
+
+(* Predicate function *)
+fun queenPred n [] = PENDING
+  | queenPred n x =
+    if (isValidQueen x) then
+        if length x = n then
+            CORRECT
+        else
+            PENDING
+    else
+        INCORRECT;
+
+fun queenSolve n = bbSolve (queenPred n) (bbProducer (bbOdoIncr n) bbOdoExt (SOME (lenNList n)));
+
+
+(*
+ * Problem 6
+ *
+ * Halloween
+ *
+ *
+ * state representation
+ * 
+ * first 5 elements: Ghost, ghost, wizard, batman, robin
+ * second 5 elements: 63, 77, 83, 54, 84
+ * third 5 elements: bubblesort, insertionsort, quicksort, mergesort, hash table
+ *)
+
+fun containsDuplicate [] = false
+  | containsDuplicate (x::y::xs) =
+    if (x=y) then
+        true
+    else
+        (containsDuplicate (x::xs)) orelse (containsDuplicate (y::xs))
+  | containsDuplicate _ = false;
+
+(*
+fun halloweenPred [] = PENDING
+  | halloweenPred [a1] = PENDING
+  | halloweenPred [a1,a2] =
+    if (not(containsDuplicate [a1,a2])) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred [a1,a2,a3] =
+    if (not(containsDuplicate [a1,a2,a3])) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::[]) =
+    if (not(containsDuplicate [a1,a2,a3,a4])) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::[]) =
+    if (not(containsDuplicate [a1,a2,a3,a4,a5])) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5])) andalso ((b1=5) orelse (b1=2))) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::b2::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2])) andalso ((b2=2) orelse (b2=3)) andalso ((b2=a1) orelse (b2=a2)) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5))) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::b2::b3::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3])) andalso ((b2=2) orelse (b2=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5))) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::b2::b3::b4::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4])) andalso ((b2=2) orelse (b2=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5))) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::b2::b3::b4::b5::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5])) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::b2::b3::b4::b5::c1::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5])) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::b2::b3::b4::b5::c1::c2::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5]) orelse (containsDuplicate [c1,c2])) andalso (b5=c2) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::b2::b3::b4::b5::c1::c2::c3::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5]) orelse (containsDuplicate [c1,c2,c3])) andalso (b5=c2) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
+        PENDING
+    else
+        INCORRECT
+    | halloweenPred (a1::a2::a3::a4::a5::b1::b2::b3::b4::b5::c1::c2::c3::c4::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5]) orelse (containsDuplicate [c1,c2,c3,c4])) andalso (b5=c2) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3) andalso (c4=1)) then
+        PENDING
+    else
+        INCORRECT
+  | halloweenPred (a1::a2::a3::a4::a5::b1::b2::b3::b4::b5::c1::c2::c3::c4::c5::[]) =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5]) orelse (containsDuplicate [c1,c2,c3,c4,c5])) andalso ((c5=a1) orelse (c5=a2)) andalso (b5=c2) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3) andalso (c4=1)) then
+        CORRECT
+    else
+        INCORRECT
+  | halloweenPred _ = INCORRECT;
+
+
+
+val halloweenSolve = bbSolve halloweenPred (bbProducer (bbOdoIncr 5) bbOdoExt (SOME (lenNList 15)));
+*)
+
+
+fun halloweenPred [] = PENDING
+  | halloweenPred [a1] = PENDING
+  | halloweenPred [a1,a2] = in2 [a1,a2]
+  | halloweenPred [a1,a2,a3] = in3 [a1,a2,a3]
+  | halloweenPred [a1,a2,a3,a4] = in4 [a1,a2,a3,a4]
+  | halloweenPred [a1,a2,a3,a4,a5] = in5 [a1,a2,a3,a4,a5]
+  | halloweenPred [a1,a2,a3,a4,a5,b1] = in6 [a1,a2,a3,a4,a5,b1]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2] = in7 [a1,a2,a3,a4,a5,b1,b2]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2,b3] = in8 [a1,a2,a3,a4,a5,b1,b2,b3]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2,b3,b4] = in9 [a1,a2,a3,a4,a5,b1,b2,b3,b4]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5] = in10 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1] = in11 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2] = in12 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3] = in13 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4] = in14 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4]
+  | halloweenPred [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4,c5] = in15 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4,c5]
+  | halloweenPred _ = INCORRECT
+
+and in2 [a1,a2] =
+    if a1=a2 then
+        INCORRECT
+    else
+        PENDING
+  | in2 _ = INCORRECT
+
+and in3 [a1,a2,a3] =
+    if (not(containsDuplicate [a1,a2,a3])) then
+        PENDING
+    else
+        INCORRECT
+  | in3 _ = INCORRECT
+
+and in4 [a1,a2,a3,a4] =
+    if (not(containsDuplicate [a1,a2,a3,a4])) then
+        PENDING
+    else
+        INCORRECT
+  | in4 _ = INCORRECT
+
+and in5 [a1,a2,a3,a4,a5] =
+    if (not(containsDuplicate [a1,a2,a3,a4,a5])) then
+        PENDING
+    else
+        INCORRECT
+  | in5 _ = INCORRECT
+
+and in6 [a1,a2,a3,a4,a5,b1] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5])) andalso ((b1=5) orelse (b1=2))) then
+        PENDING
+    else
+        INCORRECT
+  | in6 _ = INCORRECT
+
+and in7 [a1,a2,a3,a4,a5,b1,b2] =
+     if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (b1=b2)) andalso ((b2=2) orelse (b2=3)) andalso ((b2=a1) orelse (b2=a2)) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5))) then
+        PENDING
+    else
+        INCORRECT
+  | in7 _ = INCORRECT
+
+and in8 [a1,a2,a3,a4,a5,b1,b2,b3] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3])) andalso ((b2=2) orelse (b2=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b3=a5) andalso ((b1=2) orelse (b1=5)) andalso ((b2=2) orelse (b2=5))) then
+        PENDING
+    else
+        INCORRECT
+  | in8 _ = INCORRECT
+
+and in9 [a1,a2,a3,a4,a5,b1,b2,b3,b4] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4])) andalso ((b2=2) orelse (b2=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5))) then
+        PENDING
+    else
+        INCORRECT
+  | in9 _ = INCORRECT
+
+and in10 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5])) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
+        PENDING
+    else
+        INCORRECT
+  | in10 _ = INCORRECT
+
+and in11 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5])) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
+        PENDING
+    else
+        INCORRECT
+  | in11 _ = INCORRECT
+
+and in12 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5]) orelse (containsDuplicate [c1,c2])) andalso (b5=c2) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
+        PENDING
+    else
+        INCORRECT
+  | in12 _ = INCORRECT
+
+and in13 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5]) orelse (containsDuplicate [c1,c2,c3])) andalso (b5=c2) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
+        PENDING
+    else
+        INCORRECT
+  | in13 _ = INCORRECT
+
+and in14 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5]) orelse (containsDuplicate [c1,c2,c3,c4])) andalso (b5=c2) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3) andalso (c4=1)) then
+        PENDING
+    else
+        INCORRECT
+  | in14 _ = INCORRECT
+
+and in15 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4,c5] =
+    if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5]) orelse (containsDuplicate [c1,c2,c3,c4,c5])) andalso ((c5=a1) orelse (c5=a2)) andalso (b5=c2) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b4=c1) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3) andalso (c4=1)) then
+        CORRECT
+    else
+        INCORRECT
+  | in15 _ = INCORRECT;
+
+val halloweenSolve = bbSolve halloweenPred (bbProducer (bbOdoIncr 5) bbOdoExt (SOME (lenNList 15)));
