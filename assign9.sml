@@ -290,6 +290,45 @@ val b9 = lazyRest b8;
 val b10 = lazyRest b9;
 val c = 92;
 
+(*
+ * Problem 4
+ *
+ * Yachts
+ *)
+
+(* nextState function *)
+fun nextState [] = NONE
+  | nextState (x::xs) =
+    if x = 10 then
+        case nextState xs of
+            NONE => NONE
+          | SOME v => SOME (1::v)
+    else
+        SOME ((x+1)::xs);
+
+(* generate a lazy list of all possible solutions *)
+fun nextGen NONE = LazyNil
+  | nextGen (SOME k) = LazyCons(k, fn () => nextGen (nextState k));
+
+(* determines if the list is valid *)
+fun isValid [] = false
+  | isValid (bd::md::hd::cd::pd::by::my::hy::cy::py::[]) =
+    if (by=1) andalso (my=2) andalso (hy=3) andalso (cy=4) andalso (bd=4) andalso (hd=5) andalso (pd<>1) andalso ((md=1) orelse (cd=1)) andalso (py=5) andalso ((pd=2) orelse (pd=4))
+    then
+        true
+    else
+        false
+  | isValid _ = false;
+
+fun fatherNames (bd::md::hd::cd::pd::by::my::hy::cy::py::[]) = [("Sir Barnacle", bd, by), ("Mr. Moore",md, my), ("Mr. Hall",hd, hy), ("Colonel Downing",cd, cy), ("Dr. Parker",pd, py)]
+  | fatherNames (x::xs) = [("Invalid", 0, 0)]
+  | fatherNames [] = [("Invalid", 0, 0)];
+
+
+fun addFatherNames lst = lazyMap fatherNames lst;
+
+val yachts = addFatherNames (lazyFilter isValid (nextGen (SOME [1,1,1,1,1,1,1,1,1,1])));
+
 <<<<<<< HEAD
 
 
@@ -538,30 +577,5 @@ and in15 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4,c5] =
   | in15 _ = INCORRECT;
 
 val halloweenSolve = bbSolve halloweenPred (bbProducer (bbOdoIncr 5) bbOdoExt (SOME (lenNList 15)));
-=======
-(*
- * Problem 4
- *
- * Yachts
- *)
-
-(* nextState function *)
-fun nextDaughter [] = NONE
-  | nextDaughter (x::xs) =
-    if x = 5 then
-        case nextDaughter xs of
-            NONE => NONE
-          | SOME v => SOME (1::v)
-    else
-        SOME ((x+1)::xs);
-
-(* generate a lazy list of all possible solutions *)
-fun daughterGen NONE = LazyNil
-  | daughterGen (SOME k) = LazyCons(k, fn () => daughterGen (nextDaughter k));
-
-(* determines if the list is valid *)
-fun isValidDaughter [] = false
-  | isValidDaughter (b::m::h::d::p::[]) = 
-    
         
 >>>>>>> e4985c082e3241ddbf0f94a2cb77a53f312fd4a5

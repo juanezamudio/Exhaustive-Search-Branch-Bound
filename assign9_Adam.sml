@@ -494,7 +494,7 @@ and in9 [a1,a2,a3,a4,a5,b1,b2,b3,b4] =
     else
         INCORRECT
   | in9 _ = INCORRECT
-
+3
 and in10 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5] =
     if (not((containsDuplicate [a1,a2,a3,a4,a5]) orelse (containsDuplicate [b1,b2,b3,b4,b5])) andalso ((b2=2) orelse (b5=2)) andalso ((b2=3) orelse (b5=3)) andalso ((b2=a1) orelse (b2=a2)) andalso (b3=a5) andalso ((b2=2) orelse (b1=2)) andalso ((b2=5) orelse (b1=5)) andalso (b5=a3)) then
         PENDING
@@ -538,30 +538,5 @@ and in15 [a1,a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4,c5] =
   | in15 _ = INCORRECT;
 
 val halloweenSolve = bbSolve halloweenPred (bbProducer (bbOdoIncr 5) bbOdoExt (SOME (lenNList 15)));
-=======
-(*
- * Problem 4
- *
- * Yachts
- *)
 
-(* nextState function *)
-fun nextDaughter [] = NONE
-  | nextDaughter (x::xs) =
-    if x = 5 then
-        case nextDaughter xs of
-            NONE => NONE
-          | SOME v => SOME (1::v)
-    else
-        SOME ((x+1)::xs);
-
-(* generate a lazy list of all possible solutions *)
-fun daughterGen NONE = LazyNil
-  | daughterGen (SOME k) = LazyCons(k, fn () => daughterGen (nextDaughter k));
-
-(* determines if the list is valid *)
-fun isValidDaughter [] = false
-  | isValidDaughter (b::m::h::d::p::[]) = 
-    
-        
 >>>>>>> e4985c082e3241ddbf0f94a2cb77a53f312fd4a5
